@@ -130,7 +130,18 @@ export interface UserSettings {
   theme?: string;
 }
 
-export type GitHubReactionContent = "+1" | "-1" | "laugh" | "confused" | "heart" | "hooray" | "rocket" | "eyes";
+export const GITHUB_REACTIONS = {
+  "+1": "👍",
+  "-1": "👎",
+  heart: "❤️",
+  rocket: "🚀",
+  eyes: "👀",
+  laugh: "😁",
+  hooray: "🎉",
+  confused: "😕",
+};
+
+export type GitHubReactionContent = keyof typeof GITHUB_REACTIONS;
 
 export interface ListMemosResponse {
   memos: Memo[];

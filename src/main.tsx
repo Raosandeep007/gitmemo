@@ -1,7 +1,7 @@
 import "@github/relative-time-element";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
 import { RouterProvider } from "react-router-dom";
@@ -11,7 +11,9 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { InstanceProvider, useInstance } from "@/contexts/InstanceContext";
 import { ViewProvider } from "@/contexts/ViewContext";
+import { hasGitHubConfig } from "@/github";
 import { queryClient } from "@/lib/query-client";
+import GitHubSetup from "@/pages/GitHubSetup";
 import router from "./router";
 import { applyLocaleEarly } from "./utils/i18n";
 import { applyThemeEarly } from "./utils/theme";
@@ -24,23 +26,48 @@ applyLocaleEarly();
 
 // Inner component that initializes contexts
 function AppInitializer({ children }: { children: React.ReactNode }) {
-  const { isInitialized: authInitialized, initialize: initAuth } = useAuth();
+  const { isInitialized: authInitialized, initialize: initAuth, currentUser } = useAuth();
   const { isInitialized: instanceInitialized, initialize: initInstance } = useInstance();
-  const initStartedRef = useRef(false);
+  const [configReady, setConfigReady] = React.useState(hasGitHubConfig());
+  const [initNonce, setInitNonce] = React.useState(0);
 
-  // Initialize on mount - run in parallel for better performance
+  // Initialize app contexts in parallel when config is ready.
   useEffect(() => {
-    if (initStartedRef.current) return;
-    initStartedRef.current = true;
+    if (!configReady) {
+      return;
+    }
 
     const init = async () => {
       await Promise.all([initInstance(), initAuth()]);
     };
-    init();
-  }, [initAuth, initInstance]);
+    void init();
+  }, [configReady, initAuth, initInstance, initNonce]);
+
+  if (!configReady) {
+    return (
+      <GitHubSetup
+        onConfigured={() => {
+          setConfigReady(hasGitHubConfig());
+          setInitNonce((prev) => prev + 1);
+        }}
+      />
+    );
+  }
 
   if (!authInitialized || !instanceInitialized) {
     return null;
+  }
+
+  if (!currentUser) {
+    return (
+      <GitHubSetup
+        initialError="Failed to authenticate with the saved GitHub configuration."
+        onConfigured={() => {
+          setConfigReady(hasGitHubConfig());
+          setInitNonce((prev) => prev + 1);
+        }}
+      />
+    );
   }
 
   return <>{children}</>;

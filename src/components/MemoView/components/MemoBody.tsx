@@ -7,12 +7,19 @@ import { useMemoViewContext } from "../MemoViewContext";
 import type { MemoBodyProps } from "../types";
 import { AttachmentList, LocationDisplay, RelationList } from "./metadata";
 
-const MemoBody: React.FC<MemoBodyProps> = ({ compact, onContentClick, onContentDoubleClick, onToggleNsfwVisibility }) => {
+const MemoBody: React.FC<MemoBodyProps> = ({
+  compact,
+  onContentClick,
+  onContentDoubleClick,
+  onToggleNsfwVisibility,
+}) => {
   const t = useTranslate();
 
   const { memo, parentPage, showNSFWContent, nsfw } = useMemoViewContext();
 
-  const referencedMemos = memo.relations.filter((relation) => relation.type === MemoRelation_Type.REFERENCE);
+  const referencedMemos = memo.relations.filter(
+    (relation) => relation.type === MemoRelation_Type.REFERENCE,
+  );
 
   return (
     <>
@@ -30,7 +37,11 @@ const MemoBody: React.FC<MemoBodyProps> = ({ compact, onContentClick, onContentD
           compact={memo.pinned ? false : compact} // Always show full content when pinned
         />
         <AttachmentList attachments={memo.attachments} />
-        <RelationList relations={referencedMemos} currentMemoName={memo.name} parentPage={parentPage} />
+        <RelationList
+          relations={referencedMemos}
+          currentMemoName={memo.name}
+          parentPage={parentPage}
+        />
         {memo.location && <LocationDisplay location={memo.location} />}
         <MemoReactionListView memo={memo} reactions={memo.reactions} />
       </div>

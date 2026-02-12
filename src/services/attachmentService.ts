@@ -1,7 +1,7 @@
 import { OWNER, octokit, REPO } from "@/github";
 import type { Attachment } from "@/types/github";
 
-const ATTACHMENTS_DIR = "attachments";
+export const ATTACHMENTS_DIR = "attachments";
 
 function fileToAttachment(file: {
   name?: string;
@@ -18,7 +18,7 @@ function fileToAttachment(file: {
     filename,
     externalLink:
       file.download_url ||
-      `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${file.path || ""}`,
+      `https://github.com/${OWNER}/${REPO}/blob/main/${file.path || ""}`,
     type: "", // MIME type not available from GitHub API listing
     size: file.size || 0,
     sha: file.sha || "",

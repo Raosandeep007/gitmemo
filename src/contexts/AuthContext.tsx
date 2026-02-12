@@ -12,6 +12,13 @@ interface AuthState {
   isLoading: boolean;
 }
 
+const DEFAULT_USER_SETTINGS: UserSettings = {
+  locale: "en",
+  memoVisibility: "PRIVATE",
+  appearance: "system",
+  theme: "system",
+};
+
 interface AuthContextValue extends AuthState {
   userGeneralSetting: UserSettings | undefined;
   initialize: () => Promise<void>;
@@ -48,8 +55,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, isLoading: true }));
     try {
       const currentUser = await userService.getCurrentUser();
+      let settings: Pick<AuthState, "userSettings" | "shortcuts"> = {
+        userSettings: DEFAULT_USER_SETTINGS,
+        shortcuts: [],
+      };
 
-      const settings = await fetchUserSettings();
+      try {
+        settings = await fetchUserSettings();
+      } catch (settingsError) {
+        console.error("Failed to fetch user settings, using defaults:", settingsError);
+      }
 
       setState({
         currentUser,

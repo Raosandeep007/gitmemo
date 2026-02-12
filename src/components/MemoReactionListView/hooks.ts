@@ -9,7 +9,10 @@ import type { Memo, MemoReaction, User } from "@/types/github";
 export type ReactionGroup = Map<string, User[]>;
 
 export const useReactionGroups = (reactions: MemoReaction[]): ReactionGroup => {
-  const creatorNames = useMemo(() => reactions.map((r) => r.creator), [reactions]);
+  const creatorNames = useMemo(
+    () => reactions.map((r) => r.creator),
+    [reactions],
+  );
   const { data: userMap } = useUsersByNames(creatorNames);
 
   return useMemo(() => {
@@ -31,12 +34,17 @@ interface UseReactionActionsOptions {
   onComplete?: () => void;
 }
 
-export const useReactionActions = ({ memo, onComplete }: UseReactionActionsOptions) => {
+export const useReactionActions = ({
+  memo,
+  onComplete,
+}: UseReactionActionsOptions) => {
   const currentUser = useCurrentUser();
   const queryClient = useQueryClient();
 
   const hasReacted = (reactionType: string) => {
-    return memo.reactions.some((r) => r.reactionType === reactionType && r.creator === currentUser?.name);
+    return memo.reactions.some(
+      (r) => r.reactionType === reactionType && r.creator === currentUser?.name,
+    );
   };
 
   const handleReactionClick = async (reactionType: string) => {
@@ -45,7 +53,9 @@ export const useReactionActions = ({ memo, onComplete }: UseReactionActionsOptio
     try {
       if (hasReacted(reactionType)) {
         const reactions = memo.reactions.filter(
-          (reaction) => reaction.reactionType === reactionType && reaction.creator === currentUser.name,
+          (reaction) =>
+            reaction.reactionType === reactionType &&
+            reaction.creator === currentUser.name,
         );
         for (const reaction of reactions) {
           await memoService.deleteMemoReaction(reaction.name);
@@ -66,7 +76,10 @@ export const useReactionActions = ({ memo, onComplete }: UseReactionActionsOptio
   return { hasReacted, handleReactionClick };
 };
 
-export const formatReactionTooltip = (users: User[], reactionType: string): string => {
+export const formatReactionTooltip = (
+  users: User[],
+  reactionType: string,
+): string => {
   if (users.length === 0) return "";
   const formatUserName = (user: User) => user.displayName || user.username;
   if (users.length < 5) {

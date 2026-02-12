@@ -133,7 +133,7 @@ function issueToMemo(issue: any): Memo {
     attachments: (meta.attachments || []).map((name: string) => ({
       name,
       filename: name.replace("attachments/", ""),
-      externalLink: `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${name}`,
+      externalLink: `https://github.com/${OWNER}/${REPO}/blob/main/${name}`,
       type: "",
       size: 0,
       sha: "",
@@ -154,7 +154,10 @@ function issueToMemo(issue: any): Memo {
 
 function buildIssueBody(content: string, meta: MemoFrontmatter): string {
   const hasMeta =
-    meta.visibility || meta.location || (meta.relations && meta.relations.length > 0) || (meta.attachments && meta.attachments.length > 0);
+    meta.visibility ||
+    meta.location ||
+    (meta.relations && meta.relations.length > 0) ||
+    (meta.attachments && meta.attachments.length > 0);
   if (!hasMeta) return content;
   return `${encodeFrontmatter(meta)}\n${content}`;
 }
@@ -246,13 +249,16 @@ function parseFilter(filter: string): ParsedFilter {
 // ============================================================================
 
 export const memoService = {
-  async listMemos(request: Partial<ListMemosRequest> = {}): Promise<ListMemosResponse> {
+  async listMemos(
+    request: Partial<ListMemosRequest> = {},
+  ): Promise<ListMemosResponse> {
     const pageSize = request.pageSize || 20;
     const page = request.pageToken ? parsePageToken(request.pageToken) : 1;
     const parsedFilter = parseFilter(request.filter || "");
 
     const state = request.state === MemoState.ARCHIVED ? "closed" : "open";
-    const labels = parsedFilter.tags?.map((t) => `tag:${t}`).join(",") || undefined;
+    const labels =
+      parsedFilter.tags?.map((t) => `tag:${t}`).join(",") || undefined;
 
     const { data } = await octokit.rest.issues.listForRepo({
       owner: OWNER,
@@ -288,7 +294,10 @@ export const memoService = {
   },
 
   async getMemo(nameOrNumber: string | number): Promise<Memo> {
-    const issueNumber = typeof nameOrNumber === "number" ? nameOrNumber : parseInt(String(nameOrNumber).replace("memos/", ""), 10);
+    const issueNumber =
+      typeof nameOrNumber === "number"
+        ? nameOrNumber
+        : parseInt(String(nameOrNumber).replace("memos/", ""), 10);
 
     const { data } = await octokit.rest.issues.get({
       owner: OWNER,
@@ -354,7 +363,11 @@ export const memoService = {
     return issueToMemo(data);
   },
 
-  async updateMemo(name: string, update: Partial<Memo> & { visibility?: Visibility }, updateMask?: string[]): Promise<Memo> {
+  async updateMemo(
+    name: string,
+    update: Partial<Memo> & { visibility?: Visibility },
+    updateMask?: string[],
+  ): Promise<Memo> {
     const issueNumber = parseInt(name.replace("memos/", ""), 10);
 
     // Fetch current issue to merge
@@ -367,14 +380,25 @@ export const memoService = {
     const currentMemo = issueToMemo(current);
     const fields = updateMask || Object.keys(update);
 
-    const newContent = fields.includes("content") ? (update.content ?? currentMemo.content) : currentMemo.content;
+    const newContent = fields.includes("content")
+      ? (update.content ?? currentMemo.content)
+      : currentMemo.content;
     const newVisibility = fields.includes("visibility")
-      ? (update.visibility ?? (currentMemo as Memo & { visibility: Visibility }).visibility)
+      ? (update.visibility ??
+        (currentMemo as Memo & { visibility: Visibility }).visibility)
       : (currentMemo as Memo & { visibility: Visibility }).visibility;
-    const newLocation = fields.includes("location") ? update.location : currentMemo.location;
-    const newRelations = fields.includes("relations") ? (update.relations ?? currentMemo.relations) : currentMemo.relations;
-    const newAttachments = fields.includes("attachments") ? (update.attachments ?? currentMemo.attachments) : currentMemo.attachments;
-    const newPinned = fields.includes("pinned") ? (update.pinned ?? currentMemo.pinned) : currentMemo.pinned;
+    const newLocation = fields.includes("location")
+      ? update.location
+      : currentMemo.location;
+    const newRelations = fields.includes("relations")
+      ? (update.relations ?? currentMemo.relations)
+      : currentMemo.relations;
+    const newAttachments = fields.includes("attachments")
+      ? (update.attachments ?? currentMemo.attachments)
+      : currentMemo.attachments;
+    const newPinned = fields.includes("pinned")
+      ? (update.pinned ?? currentMemo.pinned)
+      : currentMemo.pinned;
 
     // Extract tags from content
     const contentTags = extractTagsFromContent(newContent);
@@ -543,7 +567,10 @@ export const memoService = {
     }));
   },
 
-  async upsertMemoReaction(name: string, reactionType: string): Promise<MemoReaction> {
+  async upsertMemoReaction(
+    name: string,
+    reactionType: string,
+  ): Promise<MemoReaction> {
     const issueNumber = parseInt(name.replace("memos/", ""), 10);
     const { data } = await octokit.rest.reactions.createForIssue({
       owner: OWNER,

@@ -1,9 +1,17 @@
 import { SmilePlusIcon } from "lucide-react";
 import { useState } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useInstance } from "@/contexts/InstanceContext";
 import { cn } from "@/lib/utils";
-import type { Memo } from "@/types/github";
+import {
+  GITHUB_REACTIONS,
+  GitHubReactionContent,
+  type Memo,
+} from "@/types/github";
 import { useReactionActions } from "./hooks";
 
 interface Props {
@@ -47,11 +55,12 @@ const ReactionSelector = (props: Props) => {
               key={reactionType}
               className={cn(
                 "inline-flex w-auto text-base cursor-pointer rounded px-1 text-muted-foreground hover:opacity-80 transition-colors",
-                hasReacted(reactionType) && "bg-secondary text-secondary-foreground",
+                hasReacted(reactionType) &&
+                  "bg-secondary text-secondary-foreground",
               )}
               onClick={() => handleReactionClick(reactionType)}
             >
-              {reactionType}
+              {GITHUB_REACTIONS[reactionType as GitHubReactionContent]}
             </button>
           ))}
         </div>

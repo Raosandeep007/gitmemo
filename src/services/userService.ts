@@ -5,7 +5,6 @@ import { UserRole, UserState } from "@/types/github";
 export const userService = {
   async getCurrentUser(): Promise<User> {
     const { data } = await octokit.rest.users.getAuthenticated();
-    console.log("data:", data);
 
     return {
       name: `users/${data.login}`,
@@ -38,14 +37,12 @@ export const userService = {
     // GitHub API returns total_count in search but not in list
     // We use the array length from per_page=1 as an indicator
     // For accurate counts we'd need to use the search API
-    const { data: searchOpen } =
-      await octokit.rest.search.issuesAndPullRequests({
-        q: `repo:${OWNER}/${REPO} is:issue is:open`,
-      });
-    const { data: searchClosed } =
-      await octokit.rest.search.issuesAndPullRequests({
-        q: `repo:${OWNER}/${REPO} is:issue is:closed -label:deleted`,
-      });
+    const { data: searchOpen } = await octokit.rest.search.issuesAndPullRequests({
+      q: `repo:${OWNER}/${REPO} is:issue is:open`,
+    });
+    const { data: searchClosed } = await octokit.rest.search.issuesAndPullRequests({
+      q: `repo:${OWNER}/${REPO} is:issue is:closed -label:deleted`,
+    });
     const { data: recentIssues } = await octokit.rest.issues.listForRepo({
       owner: OWNER,
       repo: REPO,
@@ -53,9 +50,7 @@ export const userService = {
       per_page: 100,
       ...(username ? { creator: username } : {}),
     });
-    const memoDisplayTimestamps = recentIssues
-      .filter((issue) => !issue.pull_request)
-      .map((issue) => new Date(issue.created_at));
+    const memoDisplayTimestamps = recentIssues.filter((issue) => !issue.pull_request).map((issue) => new Date(issue.created_at));
 
     return {
       memoCount: searchOpen.total_count,

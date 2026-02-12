@@ -4,6 +4,7 @@ export const ROUTES = {
   ARCHIVED: "/archived",
   SETTING: "/setting",
   EXPLORE: "/explore",
+  GITHUB_SETUP: "/github-setup",
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;

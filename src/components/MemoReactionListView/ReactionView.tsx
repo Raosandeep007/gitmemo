@@ -1,8 +1,13 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
-import type { Memo, User } from "@/types/github";
-import { MemoState as State } from "@/types/github";
+import type { GitHubReactionContent, Memo, User } from "@/types/github";
+import { GITHUB_REACTIONS, MemoState as State } from "@/types/github";
 import { formatReactionTooltip, useReactionActions } from "./hooks";
 
 interface Props {
@@ -14,7 +19,9 @@ interface Props {
 const ReactionView = (props: Props) => {
   const { memo, reactionType, users } = props;
   const currentUser = useCurrentUser();
-  const hasReaction = users.some((user) => currentUser && user.username === currentUser.username);
+  const hasReaction = users.some(
+    (user) => currentUser && user.username === currentUser.username,
+  );
   const readonly = memo.state === State.ARCHIVED;
 
   const { handleReactionClick } = useReactionActions({ memo });
@@ -42,7 +49,9 @@ const ReactionView = (props: Props) => {
             onClick={handleClick}
             disabled={!isClickable}
           >
-            <span>{reactionType}</span>
+            <span>
+              {GITHUB_REACTIONS[reactionType as GitHubReactionContent]}
+            </span>
             <span className="opacity-60">{users.length}</span>
           </button>
         </TooltipTrigger>

@@ -1,5 +1,10 @@
 import dayjs from "dayjs";
-import { ExternalLinkIcon, PaperclipIcon, SearchIcon, Trash } from "lucide-react";
+import {
+  ExternalLinkIcon,
+  PaperclipIcon,
+  SearchIcon,
+  Trash,
+} from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -10,7 +15,10 @@ import MobileHeader from "@/components/MobileHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { useAttachments, useDeleteAttachment } from "@/hooks/useAttachmentQueries";
+import {
+  useAttachments,
+  useDeleteAttachment,
+} from "@/hooks/useAttachmentQueries";
 import useDialog from "@/hooks/useDialog";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import i18n from "@/i18n";
@@ -31,9 +39,14 @@ const getAttachmentDate = (attachment: Attachment): Date => {
   return new Date();
 };
 
-const groupAttachmentsByDate = (attachments: Attachment[]): Map<string, Attachment[]> => {
+const groupAttachmentsByDate = (
+  attachments: Attachment[],
+): Map<string, Attachment[]> => {
   const grouped = new Map<string, Attachment[]>();
-  const sorted = [...attachments].sort((a, b) => dayjs(getAttachmentDate(b)).unix() - dayjs(getAttachmentDate(a)).unix());
+  const sorted = [...attachments].sort(
+    (a, b) =>
+      dayjs(getAttachmentDate(b)).unix() - dayjs(getAttachmentDate(a)).unix(),
+  );
 
   for (const attachment of sorted) {
     const monthKey = dayjs(getAttachmentDate(attachment)).format("YYYY-MM");
@@ -45,10 +58,15 @@ const groupAttachmentsByDate = (attachments: Attachment[]): Map<string, Attachme
   return grouped;
 };
 
-const filterAttachments = (attachments: Attachment[], searchQuery: string): Attachment[] => {
+const filterAttachments = (
+  attachments: Attachment[],
+  searchQuery: string,
+): Attachment[] => {
   if (!searchQuery.trim()) return attachments;
   const query = searchQuery.toLowerCase();
-  return attachments.filter((attachment) => attachment.filename.toLowerCase().includes(query));
+  return attachments.filter((attachment) =>
+    attachment.filename.toLowerCase().includes(query),
+  );
 };
 
 interface AttachmentItemProps {
@@ -61,9 +79,15 @@ const AttachmentItem = ({ attachment }: AttachmentItemProps) => (
       <AttachmentIcon attachment={attachment} strokeWidth={0.5} />
     </div>
     <div className="w-full max-w-full flex flex-row justify-between items-center mt-1 px-1">
-      <p className="text-xs shrink text-muted-foreground truncate">{attachment.filename}</p>
+      <p className="text-xs shrink text-muted-foreground truncate">
+        {attachment.filename}
+      </p>
       {attachment.memo && (
-        <Link to={`/${attachment.memo}`} className="text-primary hover:opacity-80 transition-opacity shrink-0 ml-1" aria-label="View memo">
+        <Link
+          to={`/${attachment.memo}`}
+          className="text-primary hover:opacity-80 transition-opacity shrink-0 ml-1"
+          aria-label="View memo"
+        >
           <ExternalLinkIcon className="w-3 h-3" />
         </Link>
       )}
@@ -80,10 +104,22 @@ const Attachments = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredAttachments = useMemo(() => filterAttachments(attachments, searchQuery), [attachments, searchQuery]);
-  const usedAttachments = useMemo(() => filteredAttachments.filter((attachment) => attachment.memo), [filteredAttachments]);
-  const unusedAttachments = useMemo(() => filteredAttachments.filter((attachment) => !attachment.memo), [filteredAttachments]);
-  const groupedAttachments = useMemo(() => groupAttachmentsByDate(usedAttachments), [usedAttachments]);
+  const filteredAttachments = useMemo(
+    () => filterAttachments(attachments, searchQuery),
+    [attachments, searchQuery],
+  );
+  const usedAttachments = useMemo(
+    () => filteredAttachments.filter((attachment) => attachment.memo),
+    [filteredAttachments],
+  );
+  const unusedAttachments = useMemo(
+    () => filteredAttachments.filter((attachment) => !attachment.memo),
+    [filteredAttachments],
+  );
+  const groupedAttachments = useMemo(
+    () => groupAttachmentsByDate(usedAttachments),
+    [usedAttachments],
+  );
 
   const handleDeleteUnusedAttachments = useCallback(async () => {
     try {
@@ -103,9 +139,12 @@ const Attachments = () => {
     }
   }, [unusedAttachments, deleteAttachment, t, refetch]);
 
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  }, []);
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value);
+    },
+    [],
+  );
 
   return (
     <section className="@container w-full max-w-5xl min-h-full flex flex-col justify-start items-center sm:pt-3 md:pt-6 pb-8">
@@ -120,42 +159,69 @@ const Attachments = () => {
             <div>
               <div className="relative max-w-32">
                 <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input className="pl-9" placeholder={t("common.search")} value={searchQuery} onChange={handleSearchChange} />
+                <Input
+                  className="pl-9"
+                  placeholder={t("common.search")}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
               </div>
             </div>
           </div>
           <div className="w-full flex flex-col justify-start items-start mt-4 mb-6">
             {isLoading ? (
               <div className="w-full h-32 flex flex-col justify-center items-center">
-                <p className="w-full text-center text-base my-6 mt-8">{t("resource.fetching-data")}</p>
+                <p className="w-full text-center text-base my-6 mt-8">
+                  {t("resource.fetching-data")}
+                </p>
               </div>
             ) : (
               <>
                 {filteredAttachments.length === 0 ? (
                   <div className="w-full mt-8 mb-8 flex flex-col justify-center items-center italic">
                     <Empty />
-                    <p className="mt-4 text-muted-foreground">{t("message.no-data")}</p>
+                    <p className="mt-4 text-muted-foreground">
+                      {t("message.no-data")}
+                    </p>
                   </div>
                 ) : (
                   <>
-                    <div className={"w-full h-auto px-2 flex flex-col justify-start items-start gap-y-8"}>
-                      {Array.from(groupedAttachments.entries()).map(([monthStr, monthAttachments]) => {
-                        return (
-                          <div key={monthStr} className="w-full flex flex-row justify-start items-start">
-                            <div className="w-16 sm:w-24 pt-4 sm:pl-4 flex flex-col justify-start items-start">
-                              <span className="text-sm opacity-60">{dayjs(monthStr).year()}</span>
-                              <span className="font-medium text-xl">
-                                {dayjs(monthStr).toDate().toLocaleString(i18n.language, { month: "short" })}
-                              </span>
+                    <div
+                      className={
+                        "w-full h-auto px-2 flex flex-col justify-start items-start gap-y-8"
+                      }
+                    >
+                      {Array.from(groupedAttachments.entries()).map(
+                        ([monthStr, monthAttachments]) => {
+                          return (
+                            <div
+                              key={monthStr}
+                              className="w-full flex flex-row justify-start items-start"
+                            >
+                              <div className="w-16 sm:w-24 pt-4 sm:pl-4 flex flex-col justify-start items-start">
+                                <span className="text-sm opacity-60">
+                                  {dayjs(monthStr).year()}
+                                </span>
+                                <span className="font-medium text-xl">
+                                  {dayjs(monthStr)
+                                    .toDate()
+                                    .toLocaleString(i18n.language, {
+                                      month: "short",
+                                    })}
+                                </span>
+                              </div>
+                              <div className="w-full max-w-[calc(100%-4rem)] sm:max-w-[calc(100%-6rem)] flex flex-row justify-start items-start gap-4 flex-wrap">
+                                {monthAttachments.map((attachment) => (
+                                  <AttachmentItem
+                                    key={attachment.name}
+                                    attachment={attachment}
+                                  />
+                                ))}
+                              </div>
                             </div>
-                            <div className="w-full max-w-[calc(100%-4rem)] sm:max-w-[calc(100%-6rem)] flex flex-row justify-start items-start gap-4 flex-wrap">
-                              {monthAttachments.map((attachment) => (
-                                <AttachmentItem key={attachment.name} attachment={attachment} />
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        },
+                      )}
 
                       {unusedAttachments.length > 0 && (
                         <>
@@ -165,18 +231,31 @@ const Attachments = () => {
                             <div className="w-full max-w-[calc(100%-4rem)] sm:max-w-[calc(100%-6rem)] flex flex-row justify-start items-start gap-4 flex-wrap">
                               <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                 <div className="flex flex-row items-center gap-2">
-                                  <span className="text-muted-foreground">{t("resource.unused-resources")}</span>
-                                  <span className="text-muted-foreground opacity-80">({unusedAttachments.length})</span>
+                                  <span className="text-muted-foreground">
+                                    {t("resource.unused-resources")}
+                                  </span>
+                                  <span className="text-muted-foreground opacity-80">
+                                    ({unusedAttachments.length})
+                                  </span>
                                 </div>
                                 <div>
-                                  <Button variant="destructive" onClick={() => deleteUnusedAttachmentsDialog.open()} size="sm">
+                                  <Button
+                                    variant="destructive"
+                                    onClick={() =>
+                                      deleteUnusedAttachmentsDialog.open()
+                                    }
+                                    size="sm"
+                                  >
                                     <Trash />
                                     {t("resource.delete-all-unused")}
                                   </Button>
                                 </div>
                               </div>
                               {unusedAttachments.map((attachment) => (
-                                <AttachmentItem key={attachment.name} attachment={attachment} />
+                                <AttachmentItem
+                                  key={attachment.name}
+                                  attachment={attachment}
+                                />
                               ))}
                             </div>
                           </div>

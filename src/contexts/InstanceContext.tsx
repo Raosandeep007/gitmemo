@@ -1,6 +1,13 @@
-import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { settingsService } from "@/services";
-import type { UserSettings } from "@/types/github";
+import { GITHUB_REACTIONS, type UserSettings } from "@/types/github";
 
 interface InstanceProfile {
   version: string;
@@ -61,7 +68,7 @@ const defaultGeneralSetting: GeneralSetting = {
 
 const defaultMemoRelatedSetting: MemoRelatedSetting = {
   contentLengthLimit: 0,
-  reactions: ["+1", "-1", "heart", "rocket", "eyes", "laugh", "hooray", "confused"],
+  reactions: Object.keys(GITHUB_REACTIONS),
   disallowPublicVisibility: false,
   displayWithUpdateTime: false,
 };
@@ -108,7 +115,11 @@ export function InstanceProvider({ children }: { children: ReactNode }) {
     [state, initialize],
   );
 
-  return <InstanceContext.Provider value={value}>{children}</InstanceContext.Provider>;
+  return (
+    <InstanceContext.Provider value={value}>
+      {children}
+    </InstanceContext.Provider>
+  );
 }
 
 export function useInstance() {

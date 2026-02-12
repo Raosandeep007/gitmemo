@@ -2,6 +2,8 @@ import { PenLineIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useDialog } from "@/hooks/useDialog";
+import useNavigateTo from "@/hooks/useNavigateTo";
+import { Routes } from "@/router";
 import { useTranslate } from "@/utils/i18n";
 import UpdateAccountDialog from "../UpdateAccountDialog";
 import UserAvatar from "../UserAvatar";
@@ -12,6 +14,7 @@ const MyAccountSection = () => {
   const t = useTranslate();
   const user = useCurrentUser();
   const accountDialog = useDialog();
+  const navigateTo = useNavigateTo();
 
   const handleEditAccount = () => {
     accountDialog.open();
@@ -33,6 +36,9 @@ const MyAccountSection = () => {
             <Button variant="outline" size="sm" onClick={handleEditAccount}>
               <PenLineIcon className="w-4 h-4 mr-1.5" />
               {t("common.edit")}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigateTo(Routes.GITHUB_SETUP)}>
+              GitHub Setup
             </Button>
           </div>
         </div>

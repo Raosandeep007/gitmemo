@@ -16,10 +16,7 @@ const DEFAULT_SETTINGS: UserSettings = {
 // Generic JSON file helpers
 // ============================================================================
 
-async function readJsonFile<T>(
-  path: string,
-  defaultValue: T,
-): Promise<{ data: T; sha: string }> {
+async function readJsonFile<T>(path: string, defaultValue: T): Promise<{ data: T; sha: string }> {
   try {
     const { data } = await octokit.rest.repos.getContent({
       owner: OWNER,
@@ -34,24 +31,14 @@ async function readJsonFile<T>(
     const content = atob(data.content);
     return { data: JSON.parse(content), sha: data.sha };
   } catch (e: unknown) {
-    if (
-      e &&
-      typeof e === "object" &&
-      "status" in e &&
-      (e as { status: number }).status === 404
-    ) {
+    if (e && typeof e === "object" && "status" in e && (e as { status: number }).status === 404) {
       return { data: defaultValue, sha: "" };
     }
     throw e;
   }
 }
 
-async function writeJsonFile<T>(
-  path: string,
-  data: T,
-  sha: string,
-  message: string,
-): Promise<string> {
+async function writeJsonFile<T>(path: string, data: T, sha: string, message: string): Promise<string> {
   const content = btoa(JSON.stringify(data, null, 2));
 
   const params: {
@@ -70,8 +57,7 @@ async function writeJsonFile<T>(
   };
   if (sha) params.sha = sha;
 
-  const { data: result } =
-    await octokit.rest.repos.createOrUpdateFileContents(params);
+  const { data: result } = await octokit.rest.repos.createOrUpdateFileContents(params);
   return result.content?.sha || "";
 }
 
@@ -81,10 +67,7 @@ async function writeJsonFile<T>(
 
 export const settingsService = {
   async getSettings(): Promise<UserSettings> {
-    const { data } = await readJsonFile<UserSettings>(
-      SETTINGS_PATH,
-      DEFAULT_SETTINGS,
-    );
+    const { data } = await readJsonFile<UserSettings>(SETTINGS_PATH, DEFAULT_SETTINGS);
     const merged = { ...DEFAULT_SETTINGS, ...data };
     return {
       ...merged,
@@ -94,26 +77,13 @@ export const settingsService = {
   },
 
   async updateSettings(settings: Partial<UserSettings>): Promise<UserSettings> {
-    const { data: current, sha } = await readJsonFile<UserSettings>(
-      SETTINGS_PATH,
-      DEFAULT_SETTINGS,
-    );
+    const { data: current, sha } = await readJsonFile<UserSettings>(SETTINGS_PATH, DEFAULT_SETTINGS);
     const updated = {
       ...DEFAULT_SETTINGS,
       ...current,
       ...settings,
-      theme:
-        settings.theme ??
-        settings.appearance ??
-        current.theme ??
-        current.appearance ??
-        "system",
-      appearance:
-        settings.appearance ??
-        settings.theme ??
-        current.appearance ??
-        current.theme ??
-        "system",
+      theme: settings.theme ?? settings.appearance ?? current.theme ?? current.appearance ?? "system",
+      appearance: settings.appearance ?? settings.theme ?? current.appearance ?? current.theme ?? "system",
     };
     await writeJsonFile(SETTINGS_PATH, updated, sha, "Update user settings");
     return updated;
@@ -128,14 +98,8 @@ export const settingsService = {
     return data;
   },
 
-  async createShortcut(shortcut: {
-    title: string;
-    filter: string;
-  }): Promise<Shortcut> {
-    const { data: shortcuts, sha } = await readJsonFile<Shortcut[]>(
-      SHORTCUTS_PATH,
-      [],
-    );
+  async createShortcut(shortcut: { title: string; filter: string }): Promise<Shortcut> {
+    const { data: shortcuts, sha } = await readJsonFile<Shortcut[]>(SHORTCUTS_PATH, []);
     const id = crypto.randomUUID();
     const newShortcut: Shortcut = {
       name: `shortcuts/${id}`,
@@ -144,44 +108,23 @@ export const settingsService = {
       filter: shortcut.filter,
     };
     shortcuts.push(newShortcut);
-    await writeJsonFile(
-      SHORTCUTS_PATH,
-      shortcuts,
-      sha,
-      `Create shortcut: ${shortcut.title}`,
-    );
+    await writeJsonFile(SHORTCUTS_PATH, shortcuts, sha, `Create shortcut: ${shortcut.title}`);
     return newShortcut;
   },
 
   async updateShortcut(shortcut: Shortcut): Promise<Shortcut> {
-    const { data: shortcuts, sha } = await readJsonFile<Shortcut[]>(
-      SHORTCUTS_PATH,
-      [],
-    );
+    const { data: shortcuts, sha } = await readJsonFile<Shortcut[]>(SHORTCUTS_PATH, []);
     const index = shortcuts.findIndex((s) => s.id === shortcut.id);
     if (index === -1) throw new Error(`Shortcut not found: ${shortcut.id}`);
     shortcuts[index] = shortcut;
-    await writeJsonFile(
-      SHORTCUTS_PATH,
-      shortcuts,
-      sha,
-      `Update shortcut: ${shortcut.title}`,
-    );
+    await writeJsonFile(SHORTCUTS_PATH, shortcuts, sha, `Update shortcut: ${shortcut.title}`);
     return shortcut;
   },
 
   async deleteShortcut(name: string): Promise<void> {
     const id = name.replace("shortcuts/", "");
-    const { data: shortcuts, sha } = await readJsonFile<Shortcut[]>(
-      SHORTCUTS_PATH,
-      [],
-    );
+    const { data: shortcuts, sha } = await readJsonFile<Shortcut[]>(SHORTCUTS_PATH, []);
     const filtered = shortcuts.filter((s) => s.id !== id);
-    await writeJsonFile(
-      SHORTCUTS_PATH,
-      filtered,
-      sha,
-      `Delete shortcut: ${id}`,
-    );
+    await writeJsonFile(SHORTCUTS_PATH, filtered, sha, `Delete shortcut: ${id}`);
   },
 };

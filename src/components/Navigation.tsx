@@ -1,11 +1,6 @@
 import { EarthIcon, LibraryIcon, PaperclipIcon } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { Routes } from "@/router";
@@ -48,22 +43,12 @@ const Navigation = (props: Props) => {
     title: t("common.attachments"),
     icon: <PaperclipIcon className="w-6 h-auto shrink-0" />,
   };
-  const navLinks: NavLinkItem[] = currentUser
-    ? [homeNavLink, exploreNavLink, attachmentsNavLink]
-    : [exploreNavLink];
+  const navLinks: NavLinkItem[] = currentUser ? [homeNavLink, exploreNavLink, attachmentsNavLink] : [exploreNavLink];
 
   return (
-    <header
-      className={cn(
-        "w-full h-full overflow-auto flex flex-col justify-between items-start gap-4",
-        className,
-      )}
-    >
+    <header className={cn("w-full h-full overflow-auto flex flex-col justify-between items-start gap-4", className)}>
       <div className="w-full px-1 py-1 flex flex-col justify-start items-start space-y-2 overflow-auto overflow-x-hidden shrink">
-        <NavLink
-          className="mb-3 cursor-default"
-          to={currentUser ? Routes.ROOT : Routes.EXPLORE}
-        >
+        <NavLink className="mb-3 cursor-default" to={currentUser ? Routes.ROOT : Routes.EXPLORE}>
           <MemosLogo collapsed={collapsed} />
         </NavLink>
         {navLinks.map((navLink) => (
@@ -96,19 +81,12 @@ const Navigation = (props: Props) => {
             ) : (
               navLink.icon
             )}
-            {!props.collapsed && (
-              <span className="ml-3 truncate">{navLink.title}</span>
-            )}
+            {!props.collapsed && <span className="ml-3 truncate">{navLink.title}</span>}
           </NavLink>
         ))}
       </div>
       {currentUser && (
-        <div
-          className={cn(
-            "w-full flex flex-col justify-end",
-            props.collapsed ? "items-center" : "items-start pl-3",
-          )}
-        >
+        <div className={cn("w-full flex flex-col justify-end", props.collapsed ? "items-center" : "items-start pl-3")}>
           <UserMenu collapsed={collapsed} />
         </div>
       )}

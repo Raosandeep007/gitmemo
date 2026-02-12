@@ -1,13 +1,4 @@
-import {
-  ArchiveIcon,
-  CheckIcon,
-  GlobeIcon,
-  LogOutIcon,
-  PaletteIcon,
-  SettingsIcon,
-  SquareUserIcon,
-  User2Icon,
-} from "lucide-react";
+import { ArchiveIcon, CheckIcon, GlobeIcon, LogOutIcon, PaletteIcon, SettingsIcon, SquareUserIcon, User2Icon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useNavigateTo from "@/hooks/useNavigateTo";
@@ -15,12 +6,7 @@ import { useUpdateUserGeneralSetting } from "@/hooks/useUserQueries";
 import { locales } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { Routes } from "@/router";
-import {
-  getLocaleDisplayName,
-  getLocaleWithFallback,
-  loadLocale,
-  useTranslate,
-} from "@/utils/i18n";
+import { getLocaleDisplayName, getLocaleWithFallback, loadLocale, useTranslate } from "@/utils/i18n";
 import { getThemeWithFallback, loadTheme, THEME_OPTIONS } from "@/utils/theme";
 import UserAvatar from "./UserAvatar";
 import {
@@ -43,9 +29,7 @@ const UserMenu = (props: Props) => {
   const navigateTo = useNavigateTo();
   const currentUser = useCurrentUser();
   const { userGeneralSetting, refetchSettings, logout } = useAuth();
-  const { mutate: updateUserGeneralSetting } = useUpdateUserGeneralSetting(
-    currentUser?.name,
-  );
+  const { mutate: updateUserGeneralSetting } = useUpdateUserGeneralSetting(currentUser?.name);
   const currentLocale = getLocaleWithFallback(userGeneralSetting?.locale);
   const currentTheme = getThemeWithFallback(userGeneralSetting?.theme);
 
@@ -86,13 +70,7 @@ const UserMenu = (props: Props) => {
     try {
       // Then clear user-specific localStorage items
       // Preserve app-wide settings (theme, locale, view preferences, tag view settings)
-      const keysToPreserve = [
-        "memos-theme",
-        "memos-locale",
-        "memos-view-setting",
-        "tag-view-as-tree",
-        "tag-tree-auto-expand",
-      ];
+      const keysToPreserve = ["memos-theme", "memos-locale", "memos-view-setting", "tag-view-as-tree", "tag-tree-auto-expand"];
       const keysToRemove: string[] = [];
 
       for (let i = 0; i < localStorage.length; i++) {
@@ -113,17 +91,9 @@ const UserMenu = (props: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild disabled={!currentUser}>
-        <div
-          className={cn(
-            "w-auto flex flex-row justify-start items-center cursor-pointer text-foreground",
-            collapsed ? "px-1" : "px-3",
-          )}
-        >
+        <div className={cn("w-auto flex flex-row justify-start items-center cursor-pointer text-foreground", collapsed ? "px-1" : "px-3")}>
           {currentUser?.avatarUrl ? (
-            <UserAvatar
-              className="shrink-0"
-              avatarUrl={currentUser?.avatarUrl}
-            />
+            <UserAvatar className="shrink-0" avatarUrl={currentUser?.avatarUrl} />
           ) : (
             <User2Icon className="w-6 mx-auto h-auto text-muted-foreground" />
           )}
@@ -135,11 +105,7 @@ const UserMenu = (props: Props) => {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        <DropdownMenuItem
-          onClick={() =>
-            navigateTo(`/u/${encodeURIComponent(currentUser?.username ?? "")}`)
-          }
-        >
+        <DropdownMenuItem onClick={() => navigateTo(`/u/${encodeURIComponent(currentUser?.username ?? "")}`)}>
           <SquareUserIcon className="size-4 text-muted-foreground" />
           {t("common.profile")}
         </DropdownMenuItem>
@@ -154,13 +120,8 @@ const UserMenu = (props: Props) => {
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="max-h-[90vh] overflow-y-auto">
             {locales.map((locale) => (
-              <DropdownMenuItem
-                key={locale}
-                onClick={() => handleLocaleChange(locale)}
-              >
-                {currentLocale === locale && (
-                  <CheckIcon className="w-4 h-auto" />
-                )}
+              <DropdownMenuItem key={locale} onClick={() => handleLocaleChange(locale)}>
+                {currentLocale === locale && <CheckIcon className="w-4 h-auto" />}
                 {currentLocale !== locale && <span className="w-4" />}
                 {getLocaleDisplayName(locale)}
               </DropdownMenuItem>
@@ -174,13 +135,8 @@ const UserMenu = (props: Props) => {
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             {THEME_OPTIONS.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={() => handleThemeChange(option.value)}
-              >
-                {currentTheme === option.value && (
-                  <CheckIcon className="w-4 h-auto" />
-                )}
+              <DropdownMenuItem key={option.value} onClick={() => handleThemeChange(option.value)}>
+                {currentTheme === option.value && <CheckIcon className="w-4 h-auto" />}
                 {currentTheme !== option.value && <span className="w-4" />}
                 {option.label}
               </DropdownMenuItem>

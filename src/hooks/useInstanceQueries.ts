@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { settingsService } from "@/services";
-import type { UserSettings } from "@/types/github";
+import { GITHUB_REACTIONS, type UserSettings } from "@/types/github";
 
 // Query keys factory
 export const instanceKeys = {
@@ -51,7 +51,7 @@ export function useMemoRelatedSetting() {
     queryFn: async () => {
       return {
         contentLengthLimit: 0, // no limit
-        reactions: ["+1", "-1", "heart", "rocket", "eyes", "laugh", "hooray", "confused"],
+        reactions: Object.keys(GITHUB_REACTIONS),
       };
     },
     staleTime: Number.POSITIVE_INFINITY,
