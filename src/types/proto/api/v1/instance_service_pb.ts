@@ -1,0 +1,6 @@
+export enum InstanceSetting_Key {
+  KEY_UNSPECIFIED = "KEY_UNSPECIFIED",
+  GENERAL = "GENERAL",
+  MEMO_RELATED = "MEMO_RELATED",
+  STORAGE = "STORAGE",
+}
