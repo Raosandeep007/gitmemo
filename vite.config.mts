@@ -16,6 +16,12 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 3001,
     proxy: {
+      // GitHub OAuth Device Flow proxy (must come before the generic /api rule)
+      "^/api/github-oauth": {
+        target: "https://github.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/github-oauth/, "/login"),
+      },
       "^/api": {
         target: devProxyServer,
         xfwd: true,

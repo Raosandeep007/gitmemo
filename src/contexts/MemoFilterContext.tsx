@@ -1,5 +1,13 @@
 import { uniqBy } from "lodash-es";
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useSearchParams } from "react-router-dom";
 
 export type FilterFactor =
@@ -17,7 +25,8 @@ export interface MemoFilter {
   value: string;
 }
 
-export const getMemoFilterKey = (filter: MemoFilter): string => `${filter.factor}:${filter.value}`;
+export const getMemoFilterKey = (filter: MemoFilter): string =>
+  `${filter.factor}:${filter.value}`;
 
 export const parseFilterQuery = (query: string | null): MemoFilter[] => {
   if (!query) return [];
@@ -35,7 +44,9 @@ export const parseFilterQuery = (query: string | null): MemoFilter[] => {
 };
 
 export const stringifyFilters = (filters: MemoFilter[]): string => {
-  return filters.map((filter) => `${filter.factor}:${encodeURIComponent(filter.value)}`).join(",");
+  return filters
+    .map((filter) => `${filter.factor}:${encodeURIComponent(filter.value)}`)
+    .join(",");
 };
 
 interface MemoFilterContextValue {
@@ -79,7 +90,10 @@ export function MemoFilterProvider({ children }: { children: ReactNode }) {
   // Sync state to URL when state changes
   useEffect(() => {
     const storeString = stringifyFilters(filters);
-    if (storeString !== lastSyncedStoreRef.current && storeString !== lastSyncedUrlRef.current) {
+    if (
+      storeString !== lastSyncedStoreRef.current &&
+      storeString !== lastSyncedUrlRef.current
+    ) {
       lastSyncedStoreRef.current = storeString;
       const newParams = new URLSearchParams(searchParams);
       if (filters.length > 0) {
@@ -92,7 +106,10 @@ export function MemoFilterProvider({ children }: { children: ReactNode }) {
     }
   }, [filters, searchParams, setSearchParams]);
 
-  const getFiltersByFactor = useCallback((factor: FilterFactor) => filters.filter((f) => f.factor === factor), [filters]);
+  const getFiltersByFactor = useCallback(
+    (factor: FilterFactor) => filters.filter((f) => f.factor === factor),
+    [filters],
+  );
 
   const setFilters = useCallback((newFilters: MemoFilter[]) => {
     setFiltersState(newFilters);
@@ -119,7 +136,11 @@ export function MemoFilterProvider({ children }: { children: ReactNode }) {
     setShortcutState(newShortcut);
   }, []);
 
-  const hasFilter = useCallback((filter: MemoFilter) => filters.some((f) => getMemoFilterKey(f) === getMemoFilterKey(filter)), [filters]);
+  const hasFilter = useCallback(
+    (filter: MemoFilter) =>
+      filters.some((f) => getMemoFilterKey(f) === getMemoFilterKey(filter)),
+    [filters],
+  );
 
   const hasActiveFilters = filters.length > 0 || shortcut !== undefined;
 
@@ -147,7 +168,9 @@ export function MemoFilterProvider({ children }: { children: ReactNode }) {
 export function useMemoFilterContext() {
   const context = useContext(MemoFilterContext);
   if (!context) {
-    throw new Error("useMemoFilterContext must be used within MemoFilterProvider");
+    throw new Error(
+      "useMemoFilterContext must be used within MemoFilterProvider",
+    );
   }
   return context;
 }
